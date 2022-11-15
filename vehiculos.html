@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="es">    
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <script src="https://Kit.fontawesome.com/eb496ab1a0.js" crossorigin="anonymous"></script>
+            <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.2/dist/leaflet.css" integrity="sha256-sA+zWATbFveLLNqWO2gtiw3HL/lh1giY/Inf1BJ0z14=" crossorigin="" />
+            <link rel="stylesheet" href="CSS/vehiculos.css">
+            <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.9.1/font/bootstrap-icons.css">
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+
+    <title> Vehiculos </title>
+</head>
+<body id="body" class="body" onload="CallWebAPI()">
+
+    <!-- Menú -->
+
+    <div class="container">
+
+    <!-- Div Logo -->
+        <div class="collapse">
+            <a href="index.html"><img src="img/coltrack-horizontal.png" class="logo"></a>
+        </div >
+
+        <!--div menu-->
+
+        <nav class="navegacion">
+            <ul class="menu">
+                <li><a href="index.html"> Inicio </a></li>
+                <li><a href="vehiculos.html"> Vehiculos </a></li>
+                <li><a href="iframe.html"> Reportes </a></li>
+            </ul>
+        </nav>
+
+        <!-- inicio sesion enlace -->
+
+        <ul class="menu">
+            <li><a href="index.html"> Logout </a></li>
+        </ul>
+    </div>
+
+    <script type="text/javascript" >
+        
+        var userName = "servWebElite";
+        var passWord = "$s3rvW3bEl1t3%";
+        
+        function authenticateUser(user, password){
+            var auth = user + ":" + password;    
+            var hash = btoa(auth); 
+            return "Basic " + hash;
+        };
+
+        // Todos los datos
+
+        function CallWebAPI() {    
+            var request = new XMLHttpRequest();
+            var autenticate = authenticateUser(userName, passWord);
+            
+                request.open("get", "https://gps.coltrack.com/gps/api.jsp", false);	
+                request.setRequestHeader("Authorization", authenticateUser(userName, passWord));  	
+                request.send();   
+                console.log("loaded data");    
+                respuesta=JSON.parse(request.response);       
+
+            salida = respuesta.message.data;   
+            $("#Tabla").append('<tr><th>PLACA</th><th>TEMPERATURA</th><th>HORA</th><th>LUGAR</th><th>DIRECCION</th><th>CIUDAD</th><th>EVENTO</th><th>Activo</th><th> Desactivo</th></tr>');
+            $("#Tabla1").append('<tr><th>PLACA</th><th>TEMPERATURA</th><th>HORA</th><th>LUGAR</th><th>DIRECCION</th><th>CIUDAD</th><th>EVENTO</th><th>Activo | Desactivo</th></tr>');
+            $("#Tabla2").append('<tr><th>PLACA</th><th>TEMPERATURA</th><th>HORA</th><th>LUGAR</th><th>DIRECCION</th><th>CIUDAD</th><th>EVENTO</th><th>Activo | Desactivo</th></tr>');
+
+            for (let index = 0; index < salida.length; index++) {
+            $("#Tabla").append("<tr><td>"+salida[index].PLACA+"</td><td>"
+                +salida[index].TEMPERATURA+"</td><td>"
+                +salida[index].TIEMPO+"</td><td>"
+                +salida[index].LUGAR+"</td><td>"
+                +salida[index].UBICACION+"<a class= fcc-btn href=  https://maps.google.com/?q="
+                +salida[index].LATITUD+","+salida[index].LONGITUD+"> <i class='bi bi-geo-alt-fill'></i>"+"</a></td><td>"
+                +salida[index].CIUDAD+"</td><td>"
+                +salida[index].EVENTO+"</td><td>"
+                +"<button id ='Activar' onclick='Activado()'> Activar </button>"+"</td><td>"
+                +"<button id ='Desactivar' onclick='Desactivar()'> Desactivar </button>"
+            +"</td></tr>");   
+
+            +$("#Tabla1").empty("<tr><td>"+salida[index].PLACA+"</td><td>"
+                +salida[index].TEMPERATURA+"</td><td>"
+                +salida[index].TIEMPO+"</td><td>"
+                +salida[index].LUGAR+"</td><td>"
+                +salida[index].UBICACION+"<a class= fcc-btn href=  https://maps.google.com/?q="                    
+                +salida[index].LATITUD+","+salida[index].LONGITUD+"> <i class='bi bi-geo-alt-fill'></i>"+"</a></td><td>"
+                +salida[index].CIUDAD+"</td><td>"
+                +salida[index].EVENTO+"</td><td class= 'boton'>"
+                +"&nbsp &nbsp"
+                +"<button id ='Activar' onclick='Activado()'> Activar </button>"+"</td><td>"
+                +"&nbsp &nbsp"
+                +"<button id ='Desactivar' onclick='Desactivado()'> Desactivar </button>"
+            +"</td></tr>");       
+
+            +$("#Tabla2").empty("<tr><td>"+salida[index].PLACA+"</td><td>"
+                +salida[index].TEMPERATURA+"</td><td>"
+                +salida[index].TIEMPO+"</td><td>"
+                +salida[index].LUGAR+"</td><td>"
+                +salida[index].UBICACION+"<a class= fcc-btn href=  https://maps.google.com/?q="
+                +salida[index].LATITUD+","+salida[index].LONGITUD+"> <i class='bi bi-geo-alt-fill'></i>"+"</a></td><td>"
+                +salida[index].CIUDAD+"</td><td>"
+                +salida[index].EVENTO+"</td><td>"
+                +"<button id ='Activar' onclick='Activado()'> Activar </button>"+"</td><td>"
+                +"<button id ='Desactivar' onclick='Desactivado()'> Desactivar </button>"
+            +"</td></tr>");
+            };
+        }; 
+
+        // Filtro activos
+
+        function Activos(){
+            for (let index = 0; index < salida.length; index++) {
+                if (salida[index].EVENTO == "TDR Encendido" || salida[index].EVENTO == "Encendido" || salida[index].EVENTO == "TDR Encendido-No GSM" || salida[index].EVENTO == "GPS Adquirido" || salida[index].EVENTO == "Temperatura Alta > 8º"){   
+                    $("#Tabla1").append("<tr><td>"+salida[index].PLACA+"</td><td>"
+                        +salida[index].TEMPERATURA+"</td><td>"
+                        +salida[index].TIEMPO+"</td><td>"
+                        +salida[index].LUGAR+"</td><td>"
+                        +salida[index].UBICACION+"<a class= fcc-btn href=  https://maps.google.com/?q="
+                        +salida[index].LATITUD+","+salida[index].LONGITUD+"><i class='bi bi-geo-alt-fill'></i>"+"</a></td><td>"
+                        +salida[index].CIUDAD+"</td><td>"
+                        +salida[index].EVENTO+"</td><td >"
+                            +"<button id ='Activar' onclick='Activado()'> Activar </button>"+"</td><td>"
+                        +"<button id ='Desactivar' onclick='Desactivado()'> Desactivar </button>"
+                    +"</td></tr>");       
+                        
+                    +$("#Tabla").empty("<tr><td>"+salida[index].PLACA+"</td><td>"
+                        +salida[index].TEMPERATURA+"</td><td>"
+                        +salida[index].TIEMPO+"</td><td>"
+                        +salida[index].LUGAR+"</td><td>"
+                        +salida[index].UBICACION+"<a class= fcc-btn href=  https://maps.google.com/?q="
+                        +salida[index].LATITUD+","+salida[index].LONGITUD+"><i class='bi bi-geo-alt-fill'></i>"+"</a></td><td>"
+                        +salida[index].CIUDAD+"</td><td>"
+                        +salida[index].EVENTO+"</td><td>"
+                        +"<button id ='Activar' onclick='Activado()'> Activar </button>"+"</td><td>"
+                        +"<button id ='Desactivar' onclick='Desactivado()'> Desactivar </button>"
+                    +"</td></tr>");       
+
+                    +$("#Tabla2").empty("<tr><td>"+salida[index].PLACA+"</td><td>"
+                        +salida[index].TEMPERATURA+"</td><td>"
+                        +salida[index].TIEMPO+"</td><td>"
+                        +salida[index].LUGAR+"</td><td>"
+                        +salida[index].UBICACION+"<a class= fcc-btn href=  https://maps.google.com/?q="
+                        +salida[index].LATITUD+","+salida[index].LONGITUD+"> <i class='bi bi-geo-alt-fill'></i>"+"</a></td><td>"
+                        +salida[index].CIUDAD+"</td><td>"
+                        +salida[index].EVENTO+"</td><td>"
+                        +"<button id ='Activar' onclick='Activado()'> Activar </button>"+"</td><td>"
+                        +"<button id ='Desactivar' onclick='Desactivado()'> Desactivar </button>"
+                    +"</td></tr>");       
+                };
+            };
+        };
+
+        // Filtro inactivos
+
+        function Inactivos(){
+            for (let index = 0; index < salida.length; index++) {
+                if (salida[index].EVENTO == "TDR Apagado" || salida[index].EVENTO == "Apagado" || salida[index].EVENTO == "Log Out" || salida[index].EVENTO == "Time Out Identificación" || salida[index].EVENTO == "Hibernación"){
+                    $("#Tabla2").append("<tr><td>"+salida[index].PLACA+"</td><td>"
+                        +salida[index].TEMPERATURA+"</td><td>"
+                        +salida[index].TIEMPO+"</td><td>"
+                        +salida[index].LUGAR+"</td><td>"
+                        +salida[index].UBICACION+"<a class= fcc-btn href=  https://maps.google.com/?q="
+                        +salida[index].LATITUD+","+salida[index].LONGITUD+"><i class='bi bi-geo-alt-fill'></i>"+"</a></td><td>"
+                        +salida[index].CIUDAD+"</td><td>"
+                        +salida[index].EVENTO+"</td><td>"
+                        +"<button id ='Activar' onclick='Activado()'> Activar </button>"+"</td><td>"
+                        +"<button id ='Desactivar' onclick='Desactivado()'> Desactivar </button>"
+                    +"</td></tr>");    
+
+                    +$("#Tabla1").empty("<tr><td>"+salida[index].PLACA+"</td><td>"
+                        +salida[index].TEMPERATURA+"</td><td>"
+                        +salida[index].TIEMPO+"</td><td>"
+                        +salida[index].LUGAR+"</td><td>"
+                        +salida[index].UBICACION+"<a class= fcc-btn href=  https://maps.google.com/?q="
+                        +salida[index].LATITUD+","+salida[index].LONGITUD+"><i class='bi bi-geo-alt-fill'></i>"+"</a></td><td>"
+                        +salida[index].CIUDAD+"</td><td>"
+                        +salida[index].EVENTO+"</td><td>"
+                        +"<button id ='Activar' onclick='Activado()'> Activar </button>"+"</td><td>"
+                        +"<button id ='Desactivar' onclick='Desactivado()'> Desactivar </button>"
+                    +"</td></tr>");     
+
+                    +$("#Tabla").empty("<tr><td>"+salida[index].PLACA+"</td><td>"
+                        +salida[index].TEMPERATURA+"</td><td>"
+                        +salida[index].TIEMPO+"</td><td>"
+                        +salida[index].LUGAR+"</td><td>"
+                        +salida[index].UBICACION+"<a class= fcc-btn href=  https://maps.google.com/?q="
+                        +salida[index].LATITUD+","+salida[index].LONGITUD+"><i class='bi bi-geo-alt-fill'></i>"+"</a></td><td>"
+                        +salida[index].CIUDAD+"</td><td>"
+                        +salida[index].EVENTO+"</td><td>"
+                        +"<button id ='Activar' onclick='Activado()'> Activar </button>"+"</td><td>"
+                        +"<button id ='Desactivar' onclick='Desactivado()'> Desactivar </button>"
+                    +"</td></tr>");    
+                    
+                    document.cookie ="Estado=hola; expires= Thu, 10 Nov 2022 11:59:59 UTC; SameSite=None; Secure";
+
+                }; 
+            };
+        };
+
+        // Función para cada botón
+        
+        function Activado(){
+            
+            document.cookie ="Estado=Activo; expires= Thu, 10 Nov 2022 11:59:59 UTC; SameSite=None; Secure";
+            alert("el vehiculo ha iniciado ruta")
+        };
+
+        function Desactivar(){
+            document.cookie ="Estado=Desactivo; expires= Thu, 10 Nov 2022 11:59:59 UTC;  SameSite=None; Secure";
+            alert("el vehiculo ha finalizado ruta");
+        };
+
+        // function capturar(){
+        //     let act = document.getElementById("Activar").value;
+        //     console.log("hola");
+        // };
+    </script>
+
+    <br>
+
+    <section class="separador">
+        <p> 🚚 Datos por vehiculo 🚚 </p>
+    </section>
+<!-- Filtro de datos -->
+    <section class="filtro">
+       
+        <ul id="filtro">
+            <li><input type="checkbox" name="list" id="nivel2-1"><label for="nivel2-1"> Filtrar </label>
+                <ul class="interior">
+                    <li><a href="#" onclick="javascript: CallWebAPI();"> Todos </a></li>
+                    &nbsp; &nbsp; 
+
+                    <li><a href="#" onclick="javascript: Activos();"> Activos </a></li>
+                    &nbsp; &nbsp;
+
+                    <li><a href="#" onclick="javascript: Inactivos();"> Inactivos </a></li>
+                </ul>
+            </li>
+        </ul>
+    </section>
+    <!-- DATOS -->
+    <section class="datos">
+        <div>
+            <table id="Tabla"></table>
+            <table id="Tabla1"></table>
+            <table id="Tabla2"></table>
+        </div>
+    </section>
+
+    <!-- Pie de pagina -->
+    <footer class="pie_de_pagina">
+        <div class="grup-dos">
+            <small>&copy; 2022 © Copyright Coltrack SAS. Todos los derechos reservados.</small>
+        </div>
+    </footer>
+</body>
+</html>
